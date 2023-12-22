@@ -1,20 +1,32 @@
-import type { Config } from 'tailwindcss'
-
-const config: Config = {
+/** @type {import('tailwindcss').Config} */
+module.exports = {
   content: [
-    './pages/**/*.{js,ts,jsx,tsx,mdx}',
-    './components/**/*.{js,ts,jsx,tsx,mdx}',
-    './app/**/*.{js,ts,jsx,tsx,mdx}',
+    "./app/**/*.{js,ts,jsx,tsx}",
+    "./pages/**/*.{js,ts,jsx,tsx}",
+    "./components/**/*.{js,ts,jsx,tsx}",
+    "node_modules/flowbite-react/lib/esm/**/*.js",
   ],
   theme: {
     extend: {
-      backgroundImage: {
-        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
-        'gradient-conic':
-          'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
+      fontFamily: {
+        "poppins-regular": ["poppins-regular"],
+        "poppins-medium": ["poppins-medium"],
+        "poppins-semibold": ["poppins-semibold"],
+        "poppins-bold": ["poppins-bold"],
+        "poppins-light": ["poppins-light"],
+      },
+      colors: {
+        primary: "#d5ebed",
+        secondary: "#276C72",
+        third: "#8DD2D8",
+        active: "#D9F0F2",
+        bgGreen: "#B3E1E5",
+        textPrimary: "#1C2434",
+        textSecondary: "#3B3D40",
+        textPurple: "#5B33A8",
+        textGray: "#8A92A6",
       },
     },
   },
-  plugins: [],
-}
-export default config
+  plugins: [require("flowbite/plugin")],
+};
