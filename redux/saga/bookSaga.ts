@@ -27,7 +27,8 @@ function* handleUpdateBook(action: any): any {
         const result: any = yield call(
             ApiMethod.updateBook,
             action.payload.id,
-            action.payload.result
+            action.payload.formData
+            // action.payload.result
         );
         yield put(updateBookResponse(result.data.message));
     }

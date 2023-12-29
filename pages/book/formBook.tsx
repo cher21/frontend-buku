@@ -26,25 +26,39 @@ export const FormBook: React.FC<Book> = ({
   type Book = {
     judul_buku: string;
     penulis: string;
-    image: string;
+    image: FileList;
   };
 
   const handleBook = async (data: Book) => {
-    const result = {
-      judul_buku: data.judul_buku,
-      penulis: data.penulis,
-      image: data.image,
-    };
-    console.log(result);
+    // const result = {
+    //   judul_buku: data.judul_buku,
+    //   penulis: data.penulis,
+    //   image: data.image,
+    // };
+    // console.log(result);
+
+    const formData = new FormData();
+    formData.append("Judul_buku", data.judul_buku);
+    formData.append("Penulis", data.penulis);
+    formData.append("Image", data.image[0]);
+
+    console.log("Data Form:", {
+      Judul_buku: data.judul_buku,
+      Penulis: data.penulis,
+      Image: data.image[0]?.name,
+    });
+
     if (id) {
       const payload = {
         id,
-        result,
+        formData,
+        // result,
       };
+      console.log("==>", payload)
       dispatch(updateBook(payload));
       onClose({ isShow: false });
     } else {
-      dispatch(doAddBook(result));
+      dispatch(doAddBook(formData));
       onClose({ isShow: false });
     }
   };
@@ -53,7 +67,9 @@ export const FormBook: React.FC<Book> = ({
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<Book>({ resolver: yupResolver(schemaBook) });
+  } = useForm<Book>({
+    resolver: yupResolver(schemaBook) as unknown as Resolver<Book>,
+  });
 
   return (
     <div className="font-poppins-regular">
@@ -98,18 +114,19 @@ export const FormBook: React.FC<Book> = ({
           <div className="mb-2 block pt-3.5">
             <Label htmlFor="image" value="Image" />
           </div>
-          <TextInput
+          <input
             id="small"
-            sizing="md"
-            type="text"
+            type="file"
             placeholder="Image"
             {...register("image")}
-            defaultValue={image}
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              console.log("Selected File:", file?.name);
+            }}
           />
+
           {errors?.image && (
-            <p className="text-xs text-amber-700">
-              {errors.image.message}
-            </p>
+            <p className="text-xs text-amber-700">{errors.image.message}</p>
           )}
         </div>
 

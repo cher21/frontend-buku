@@ -5,15 +5,21 @@ const getBook = () => {
 }
 
 const addBook = (data: any) => {
-    return axios.post("/api/buku", data)
+    return axios.post("/api/buku", data, {
+        headers: {
+            "Content-Type": "multipart/form-data",
+        },
+    });
 }
 
 const updateBook = async (id: number, data: any) => {
     try {
-        const response = await axios.put(
-            `/api/buku/${id}`,
-            data
-        );
+        console.log("data -->",data)
+        const response = await axios.put(`/api/buku/${id}`, data, {
+            headers: {
+                "Content-Type": "multipart/form-data",
+            },
+        });
         return response;
     } catch (error: any) {
         return error.response;

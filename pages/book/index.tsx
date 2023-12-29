@@ -43,6 +43,63 @@ const Dashboard = () => {
     isShow: false,
   });
 
+  const [isViewImage, setIsViewImage] = useState({
+    judul_buku: "",
+    penulis: "",
+    tgl_publikasi: "",
+    image: "",
+    id: 0,
+    isShow: false,
+  });
+
+  const [isVideoOpen, setIsVideoOpen] = useState({
+    videoSrc: "",
+    isShow: false,
+  });
+
+  const handleOpenVideo = (videoSrc: any) => {
+    setIsVideoOpen((prevState) => ({
+      ...prevState,
+      videoSrc: videoSrc,
+      isShow: true,
+    }));
+  };
+
+
+  const [imageLoading, setImageLoading] = useState(false);
+  const [imageError, setImageError] = useState(null);
+
+  const handleViewImage = async (bookId: any, filename: any) => {
+    try {
+      setImageLoading(true);
+
+      // Make a request to the backend API to fetch the image
+      const response = await fetch(
+        `http://127.0.0.1:8080/api/buku/images/${filename}`
+      );
+      if (!response.ok) {
+        throw new Error("Failed to fetch image");
+      }
+
+      const blob = await response.blob();
+      const imageUrl = URL.createObjectURL(blob);
+
+      setIsViewImage((prevState) => ({
+        ...prevState,
+        id: bookId,
+        image: imageUrl,
+        isShow: !filename.endsWith(".mp4"),
+      }));
+
+      if (filename.endsWith(".mp4")) {
+        handleOpenVideo(imageUrl);
+      }
+    } catch (error) {
+    } finally {
+      setImageLoading(false);
+    }
+  };
+
   const hadleFromBook = () => {
     setIsOpen({
       judul_buku: "",
@@ -66,7 +123,7 @@ const Dashboard = () => {
     });
   };
 
-  const handleToggleDropdown = (rowId: number) => {
+  const handleToggleDropdown = async (rowId: number) => {
     if (openDropdownId === rowId) {
       setOpenDropdownId(null);
       setIsDropdownActive(false);
@@ -146,6 +203,11 @@ const Dashboard = () => {
             >
               Hapus
             </ListGroup.Item>
+            <ListGroup.Item
+              onClick={() => handleViewImage(book.id, book.image)}
+            >
+              Lihat Gambar
+            </ListGroup.Item>
           </ListGroup>
         )}
       </div>
@@ -206,10 +268,39 @@ const Dashboard = () => {
 
       {isDelete.isShow ? (
         <Modals header="Delete book" handleClose={handleCloseDelete}>
-          <FormDelete
-            id={isDelete.id}
-            onClose={setIsDelete}
-          />
+          <FormDelete id={isDelete.id} onClose={setIsDelete} />
+        </Modals>
+      ) : null}
+
+      {isVideoOpen.isShow ? (
+        <Modals
+          header="Watch Video"
+          handleClose={() =>
+            setIsVideoOpen((prevState) => ({ ...prevState, isShow: false }))
+          }
+        >
+          <video controls width="100%" height="auto">
+            <source src={isVideoOpen.videoSrc} type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
+        </Modals>
+      ) : null}
+
+      {isViewImage.isShow ? (
+        <Modals
+          header="View Image"
+          handleClose={() =>
+            setIsViewImage((prevState) => ({ ...prevState, isShow: false }))
+          }
+        >
+          {imageLoading ? (
+            <p>Loading image...</p>
+          ) : imageError ? (
+            <p>{imageError}</p>
+          ) : (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={isViewImage.image} alt={isViewImage.judul_buku} />
+          )}
         </Modals>
       ) : null}
     </>
